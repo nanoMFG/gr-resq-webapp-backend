@@ -1,5 +1,6 @@
-from typing import Optional, UUID, AnyUrl
-from pydantic import BaseModel, Field
+from typing import Optional
+from pydantic import BaseModel, Field, AnyUrl
+from uuid import UUID
 
 
 class SEMAnalysis(BaseModel):

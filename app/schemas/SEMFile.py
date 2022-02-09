@@ -1,5 +1,6 @@
-from typing import UUID, Optional, AnyUrl
-from pydantic import BaseModel, Field
+from typing import Optional
+from pydantic import BaseModel, Field, AnyUrl
+from uuid import UUID
 
 
 class SEMFile(BaseModel):

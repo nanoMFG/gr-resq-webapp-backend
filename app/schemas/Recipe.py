@@ -1,5 +1,6 @@
-from typing import Optional, UUID
+from typing import Optional
 from pydantic import BaseModel, Field
+from uuid import UUID
 
 
 class Recipe(BaseModel):

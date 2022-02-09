@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
-from typing import UUID, Optional, EmailStr
+from typing import Optional
+from uuid import UUID
 
 
 class Experiment(BaseModel):

@@ -1,5 +1,7 @@
 from pydantic import BaseModel, Field
-from typing import UUID, Optional
+from typing import Optional
+from uuid import UUID
+
 
 class Furnace(BaseModel):
   ID: UUID = Field(...)
