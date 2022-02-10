@@ -1,13 +1,13 @@
 from pydantic import BaseModel, Field, EmailStr
-from typing import Optional
+from typing import Optional, Literal
 from uuid import UUID
 
 
 class User(BaseModel):
-  ID: UUID = Field(...)
   email: EmailStr = Field(...)
   
 class UserInDB(User):
-  password: str = Field(...)
-  role: str = Field(...)
-  authorID: Optional[UUID] = Field(None)
+  ID: UUID = Field(...)
+  passwordHash: str = Field(...)
+  role: Literal["basic", "admin", "member", "moderator"] = Field(...)
+  authorID: Optional[int] = Field(None, "Author ID")
