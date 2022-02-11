@@ -14,3 +14,13 @@ dynamo_db_read = boto3.resource(
     aws_secret_access_key=config['DYNAMODB_READ_ONLY_SECRET_ACCESS'],
     region_name=config['DYNAMODB_READ_ONLY_REGION'],
 )
+
+dynamo_db_write = boto3.resource(
+    'dynamodb',
+    aws_access_key_id=config['DYNAMODB_READ_ONLY_ACCESS_KEY'],
+    aws_secret_access_key=config['DYNAMODB_READ_ONLY_SECRET_ACCESS'],
+    region_name=config['DYNAMODB_READ_ONLY_REGION'],
+)
+
+read_table = dynamo_db_read.Table(config['TABLE_1'])
+write_table = dynamo_db_write.Table(config['TABLE_1'])
