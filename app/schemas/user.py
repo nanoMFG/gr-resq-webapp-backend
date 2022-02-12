@@ -4,10 +4,11 @@ from uuid import UUID
 
 
 class User(BaseModel):
-  email: EmailStr = Field(...)
-  
+    email: EmailStr = Field(...)
+
+
 class UserInDB(User):
-  ID: UUID = Field(...)
-  passwordHash: str = Field(...)
-  role: Literal["basic", "admin", "member", "moderator"] = Field(...)
-  authorID: Optional[int] = Field(None, "Author ID")
+    ID: UUID = Field(...)
+    passwordHash: str = Field(...)
+    role: Literal["basic_user", "system_admin", "group_member", "group_moderator"] = Field(...)
+    authorID: Optional[int] = Field(None, "Author ID")
