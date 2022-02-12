@@ -2,6 +2,8 @@ from pydantic import BaseModel
 from app.db.serializer import generate_user_key, generate_institution_key
 import bcrypt
 from datetime import datetime
+from typing import Optional, Literal
+from decimal import Decimal
 
 
 class SignUpForm(BaseModel):
@@ -12,10 +14,12 @@ class SignUpForm(BaseModel):
     password: str
     firstName: str
     lastName: str
+    role: Optional[Literal["basic_user",
+                           "system_admin",
+                           "group_member",
+                           "group_moderator"]] = 'basic_user'
     institution: str
     addNewInstitution: bool
-
-
 
     def to_db_obj(self) -> dict:
         '''
@@ -36,5 +40,6 @@ class SignUpForm(BaseModel):
                 'SK': inst_key['SK'],
                 'Name': self.institution
             },
-            'CreatedAt': datetime.now().timestamp()
+            'Role': self.role,
+            'CreatedAt':  Decimal(datetime.now().timestamp()),
         }

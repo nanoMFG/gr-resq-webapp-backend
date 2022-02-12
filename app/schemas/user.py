@@ -10,5 +10,9 @@ class User(BaseModel):
 class UserInDB(User):
     ID: UUID = Field(...)
     passwordHash: str = Field(...)
-    role: Literal["basic_user", "system_admin", "group_member", "group_moderator"] = Field(...)
+    role: Literal[
+        "basic_user",
+        "system_admin",
+        "group_member",
+        "group_moderator"] = Field(...)
     authorID: Optional[int] = Field(None, "Author ID")
