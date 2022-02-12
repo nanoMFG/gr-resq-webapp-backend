@@ -1,1 +1,1 @@
-from user import UserInDB
+from User import UserInDB
