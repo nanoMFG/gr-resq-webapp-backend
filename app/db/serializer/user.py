@@ -1,6 +1,6 @@
 def generate_user_key(email: str):
-    key = f'USER#{email.upper()}'
+    username, domain = email.split('@')
     return {
-        'PK': key,
-        'SK': key
+        'PK': f'DOMAIN#{domain.upper()}',
+        'SK': f'USERNAME#{username.upper()}'
     }
