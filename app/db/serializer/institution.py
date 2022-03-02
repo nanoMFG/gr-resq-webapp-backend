@@ -1,5 +1,5 @@
-def generate_institution_key(country: str, name: str):
+def generate_institution_key(name: str):
     return {
-        'PK': f"COUNTRY#{country.upper()}",
+        'PK': f'INST#{name.upper()}',
         'SK': f'INST#{name.upper()}'
     }

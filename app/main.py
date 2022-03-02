@@ -1,13 +1,12 @@
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, status, HTTPException, Request
-from typing import Optional
-import sys
 import bcrypt
 import jwt
+from app.core.config import settings
 from datetime import datetime, timedelta
-from .db import read_table, write_table, query, serializer
-from .forms.user import SignUpForm, SignInForm
-from .config import config
+from .db import query, serializer
+from app.crud.forms.user import SignUpForm, SignInForm
+import httpx
 
 app = FastAPI()
 
@@ -59,12 +58,12 @@ def assign_auth_token(user: dict):
         'email': user['Email'],
         'exp': (datetime.now() + timedelta(hours=1)).timestamp()
     }
-    token = jwt.encode(payload, config['JWT_SECRET'], algorithm='HS256')
+    token = jwt.encode(payload, settings.JWT_SECRET, algorithm='HS256')
     return token
 
 
 def decode_auth_token(token: str):
-    return jwt.decode(token, config['JWT_SECRET'], algorithms="HS256")
+    return jwt.decode(token, settings.JWT_SECRET, algorithms="HS256")
 
 
 def check_password(password: str, hashed_password):
@@ -103,6 +102,28 @@ async def signin_with_form(form: SignInForm):
 async def all_institutions():
     result = query.get_all_institutions()
     return result
+
+
+@app.get('/experiments/init', status_code=status.HTTP_200_OK)
+async def tool_init():
+    async with httpx.AsyncClient(base_url=settings.GSA_DATABASE_API) as client:
+        res = await client.get('/experiments/init', timeout=60)
+    return res.json()
+
+
+@app.post('/experiments/query', status_code=status.HTTP_200_OK)
+async def experiment_query(req: Request):
+    data = await req.json()
+    with httpx.Client(base_url=settings.GSA_DATABASE_API) as client:
+        res = client.post('/experiments/query', json=data, timeout=60)
+    return res.json()
+
+
+@app.get('/experiments/{id}', status_code=status.HTTP_200_OK)
+async def experiment_query(id: int):
+    with httpx.Client(base_url=settings.GSA_DATABASE_API) as client:
+        res = client.get(f'/experiments/{id}', timeout=60)
+    return res.json()
 
 
 @app.get("*", tags=["404 Not found"], status_code=status.HTTP_404_NOT_FOUND)
