@@ -1,0 +1,22 @@
+from app.core.config import settings
+import bcrypt
+import jwt
+from datetime import datetime, timedelta
+
+
+def assign_auth_token(user: dict):
+    payload = {
+        'type': 'auth',
+        'email': user['Email'],
+        'exp': (datetime.now() + timedelta(hours=1)).timestamp()
+    }
+    token = jwt.encode(payload, settings.JWT_SECRET, algorithm='HS256')
+    return token
+
+
+def decode_auth_token(token: str):
+    return jwt.decode(token, settings.JWT_SECRET, algorithms="HS256")
+
+
+def check_password(password: str, hashed_password):
+    return bcrypt.checkpw(password.encode(), hashed_password.value)
