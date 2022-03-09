@@ -3,6 +3,8 @@ from app.schemas.forms.user import SignUpForm, SignInForm
 from app.db import query, serializer
 from datetime import datetime
 from . import utils
+from app.core.config import settings
+import httpx
 
 router = APIRouter()
 
@@ -17,6 +19,15 @@ async def signup(form: SignUpForm):
     query.put_user(user)
     institution_key = serializer.generate_institution_key(form.institution)
     institution = query.get_institution(form.institution)
+
+    author = {
+        'first_name': user['FirstName'],
+        'last_name': user['LastName'],
+        'institution': user['Institution']['Name']
+    }
+    with httpx.Client(base_url=settings.GSA_DATABASE_API) as client:
+        res = client.post('/authors', json=author)
+
     if not institution:
         query.put_institution({
             'PK': institution_key['PK'],
@@ -25,7 +36,6 @@ async def signup(form: SignUpForm):
         })
 
     response = query.put_user(user)
-    print(response)
     return {"message": "success"}
 
 
@@ -39,7 +49,8 @@ async def signin_with_token(req: Request):
 
         user = query.get_user(data.get('email'))
         new_token = utils.assign_auth_token(user)
-        return {'token': new_token}
+        author_id = utils.get_author_id(user)
+        return {'token': new_token, 'author_id': author_id}
     else:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='No token')
 
@@ -52,8 +63,7 @@ async def signin_with_form(form: SignInForm):
     if not utils.check_password(form.password, user['PasswordHash']):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Incorrect password')
     token = utils.assign_auth_token(user)
-
+    author_id = utils.get_author_id(user)
     return {
-        'token': token,
-        'email': user['Email']
+        'token': token, 'author_id': author_id
     }
