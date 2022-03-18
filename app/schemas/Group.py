@@ -1,5 +1,4 @@
 from pydantic import BaseModel, Field
-from typing import Optional
 from uuid import UUID
 
 
@@ -8,5 +7,5 @@ class Group(BaseModel):
   name: str = Field(...)
   moderators: list[UUID] = Field([])
   members: list[UUID] = Field([])
-  Experiments: list[int] = Field([])
+  experiments: list[int] = Field([])
   isPrivate: bool = Field(True)
