@@ -1,1 +1,1 @@
-from User import UserInDB
+from .User import UserInDB

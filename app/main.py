@@ -1,16 +1,13 @@
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, status, HTTPException, Request
-from typing import Optional
-import sys
-import bcrypt
-import jwt
-from datetime import datetime, timedelta
-from .db import read_table, write_table, query, serializer
-from .forms.user import SignUpForm, SignInForm
-from .config import config
+from app.api import auth, experiments
+from app.core.config import settings
+from .db import query
+import httpx
 
 app = FastAPI()
-
+app.include_router(auth.router, prefix='/auth')
+app.include_router(experiments.router, prefix='/experiments')
 # @app.on_event("startup")
 
 
@@ -29,74 +26,6 @@ app.add_middleware(
 @app.get("/", tags=["Root"], status_code=status.HTTP_200_OK)
 async def root():
     return {"message": "Gr-RESQ Backend"}
-
-
-@app.post("/auth/signup", status_code=status.HTTP_201_CREATED)
-async def signup(form: SignUpForm):
-    user = query.get_user(form.email)
-    if user:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail='Email already exists')
-
-    user = form.to_db_obj()
-    query.put_user(user)
-    institution_key = serializer.generate_institution_key(form.institution)
-    institution = query.get_institution(form.institution)
-    if not institution:
-        query.put_institution({
-            'PK': institution_key['PK'],
-            'SK': institution_key['SK'],
-            'Name': form.institution
-        })
-
-    response = query.put_user(user)
-    print(response)
-    return {"message": "success"}
-
-
-def assign_auth_token(user: dict):
-    payload = {
-        'type': 'auth',
-        'email': user['Email'],
-        'exp': (datetime.now() + timedelta(hours=1)).timestamp()
-    }
-    token = jwt.encode(payload, config['JWT_SECRET'], algorithm='HS256')
-    return token
-
-
-def decode_auth_token(token: str):
-    return jwt.decode(token, config['JWT_SECRET'], algorithms="HS256")
-
-
-def check_password(password: str, hashed_password):
-    return bcrypt.checkpw(password.encode(), hashed_password.value)
-
-
-@app.post('/auth/signin/token', status_code=status.HTTP_200_OK)
-async def signin_with_token(req: Request):
-    auth_type, auth_token = req.headers.get('authorization').split()
-    if auth_type == 'Bearer':
-        data = decode_auth_token(auth_token)
-        if data['exp'] < datetime.now().timestamp():
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Token expired')
-
-        user = query.get_user(data.get('email'))
-        new_token = assign_auth_token(user)
-    return {'token': new_token}
-
-
-@app.post('/auth/signin/credentials', status_code=status.HTTP_200_OK)
-async def signin_with_form(form: SignInForm):
-    user = query.get_user(form.email)
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='User not found')
-    if not check_password(form.password, user['PasswordHash']):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Incorrect password')
-    token = assign_auth_token(user)
-
-    return {
-        'token': token,
-        'email': user['Email']
-    }
 
 
 @app.get('/auth/institutions', status_code=status.HTTP_200_OK)

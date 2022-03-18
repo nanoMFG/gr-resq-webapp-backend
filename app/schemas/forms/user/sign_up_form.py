@@ -3,7 +3,6 @@ from app.db.serializer import generate_user_key, generate_institution_key
 import bcrypt
 from datetime import datetime
 from typing import Optional, Literal
-from decimal import Decimal
 
 
 class SignUpForm(BaseModel):
@@ -41,5 +40,5 @@ class SignUpForm(BaseModel):
                 'Name': self.institution
             },
             'Role': self.role,
-            'CreatedAt':  Decimal(datetime.now().timestamp()),
+            'CreatedAt':  int(datetime.now().timestamp()),
         }

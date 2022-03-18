@@ -15,4 +15,4 @@ class UserInDB(User):
         "system_admin",
         "group_member",
         "group_moderator"] = Field(...)
-    authorID: Optional[int] = Field(None, "Author ID")
+    authorID: Optional[int] = Field(None, description="Author ID")
