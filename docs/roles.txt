@@ -1,0 +1,57 @@
+rolePermissionsGranted = {
+  admin : [
+    {resource: "experiment", action: "create:any"},
+    {resource: "experiment", action: "read:any"},
+    {resource: "experiment", action: "update:any"},
+    {resource: "experiment", action: "delete:any"},
+    {resource: "userProfile", action: "create:any"},
+    {resource: "userProfile", action: "read:any"},
+    {resource: "userProfile", action: "update:any"},
+    {resource: "userProfile", action: "delete:any"},
+    {resource: "groupContent", action: "create:any"},
+    {resource: "groupContent", action: "read:any"},
+    {resource: "groupContent", action: "update:any"},
+    {resource: "groupContent", action: "delete:any"},
+  ],
+
+  basic: [
+    {resource: "experiment", action: "create:own"},
+    {resource: "experiment", action: "read:selective"},
+    {resource: "experiment", action: "update:own"},
+    {resource: "experiment", action: "delete:own"},
+    {resource: "userProfile", action: "create:own"},
+    {resource: "userProfile", action: "read:any"},
+    {resource: "userProfile", action: "update:own"},
+    {resource: "userProfile", action: "delete:own"},
+  ],
+
+  member: [
+    {resource: "experiment", action: "create:own"},
+    {resource: "experiment", action: "read:selective"},
+    {resource: "experiment", action: "update:own"},
+    {resource: "experiment", action: "delete:own"},
+    {resource: "userProfile", action: "create:own"},
+    {resource: "userProfile", action: "read:any"},
+    {resource: "userProfile", action: "update:own"},
+    {resource: "userProfile", action: "delete:own"},
+    {resource: "groupContent", action: "create:own"},
+    {resource: "groupContent", action: "read:any"},
+    {resource: "groupContent", action: "update:own"},
+    {resource: "groupContent", action: "delete:own"},
+  ],
+
+  moderator: [
+    {resource: "experiment", action: "create:own"},
+    {resource: "experiment", action: "read:selective"},
+    {resource: "experiment", action: "update:selective"},
+    {resource: "experiment", action: "delete:selective"},
+    {resource: "userProfile", action: "create:own"},
+    {resource: "userProfile", action: "read:any"},
+    {resource: "userProfile", action: "update:own"},
+    {resource: "userProfile", action: "delete:own"},
+    {resource: "groupContent", action: "create:own"},
+    {resource: "groupContent", action: "read:any"},
+    {resource: "groupContent", action: "update:any"},
+    {resource: "groupContent", action: "delete:any"},
+  ]
+}
