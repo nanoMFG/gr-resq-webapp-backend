@@ -24,9 +24,15 @@ const helmetConfig = helmet.contentSecurityPolicy({
 });
 
 module.exports = {
-  port: Number(process.env.PORT) || 8000,
+  port: Number(process.env.PORT) || 8080,
   IP: process.env.IP || "localhost",
   APIVersion: process.env.API_VERSION,
+  JWTSecret: process.env.JWT_SECRET,
+  JWTExpiryDuration: Number(process.env.JWT_EXPIRY_DURATION) || 86400,
+  region: process.env.REGION,
+  endpoint: process.env.ENDPOINT,
+  accessKeyID: process.env.ACCESS_KEY_ID,
+  secretAccessKey: process.env.SECRET_ACCESS_KEY,
   corsConfig,
   helmetConfig,
 };

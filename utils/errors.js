@@ -8,4 +8,11 @@ class HTTPError extends Error {
   }
 }
 
-module.exports = { HTTPError };
+class JWTError extends Error {
+  constructor(message) {
+    super(message);
+    this.type = "JWTError";
+  }
+}
+
+module.exports = { HTTPError, JWTError };

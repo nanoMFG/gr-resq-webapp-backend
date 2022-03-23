@@ -25,6 +25,16 @@ exports.errorMessages = {
     status: 500,
     message: "Internal Server Error.",
   }),
+
+  INVALID_JWT: () => ({
+    status: 401,
+    message: "Invalid JWT.",
+  }),
+
+  USER_DOES_NOT_EXIST: () => ({
+    status: 404,
+    message: "User does not exist."
+  }),
 }
 
 exports.successMessages = {}
