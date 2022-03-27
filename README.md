@@ -1,2 +1,2 @@
-# gr-resq-fastapi
-FastAPI implementation of the Gr-ResQ project.
+# gr-resq-nodejs
+Node.js implementation of the Gr-ResQ project.

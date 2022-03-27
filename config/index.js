@@ -1,5 +1,7 @@
 const path = require("path");
 const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
+const { errorMessages } = require("../utils/constants");
 const parsedEnv = require("dotenv").config({
   path: path.join(__dirname, "../.env.development"),
 });
@@ -23,6 +25,14 @@ const helmetConfig = helmet.contentSecurityPolicy({
   },
 });
 
+const rateLimiterConfig = rateLimit({
+  windowMs: Number(process.env.RATE_LIMIT_WINDOW_INTERVAL),
+  max: Number(process.env.RATE_LIMIT_ATTEMPTS),
+  message: JSON.stringify(errorMessages.RATE_LIMIT_EXCEEDED(), null, 4),
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 module.exports = {
   port: Number(process.env.PORT) || 8080,
   IP: process.env.IP || "localhost",
@@ -33,6 +43,10 @@ module.exports = {
   endpoint: process.env.ENDPOINT,
   accessKeyID: process.env.ACCESS_KEY_ID,
   secretAccessKey: process.env.SECRET_ACCESS_KEY,
+  rateLimitWindowInterval: Number(process.env.RATE_LIMIT_WINDOW_INTERVAL),
+  rateLimitAttempts: Number(process.env.RATE_LIMIT_ATTEMPTS),
+  roles: ["basic", "member", "moderator", "admin"],
   corsConfig,
   helmetConfig,
+  rateLimiterConfig,
 };

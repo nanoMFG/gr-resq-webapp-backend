@@ -1,5 +1,10 @@
 "use strict";
 
+// TODO:
+// - add validation using AJV.js
+// - add logger using winston
+// - add AWS CloudFormation templates for creating DDB tables
+
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
@@ -7,7 +12,7 @@ const morgan = require("morgan");
 const cors = require("cors");
 const helmet = require("helmet");
 
-const { port, IP, APIVersion, corsConfig, helmetConfig } = require("./config/index");
+const { port, IP, APIVersion, corsConfig, helmetConfig, rateLimiterConfig } = require("./config/index");
 const { errorMessages } = require("./utils/constants");
 const { HTTPError } = require("./utils/errors");
 const { errorHandler } = require(`./api/${APIVersion}/handlers/error`);
@@ -21,6 +26,9 @@ app.use(bodyParser.json());
 
 // morgan
 app.use(morgan("dev"));
+
+// express rate limiter
+app.use(rateLimiterConfig);
 
 // helmet
 app.use(helmet());
