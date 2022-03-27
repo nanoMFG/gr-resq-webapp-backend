@@ -33,8 +33,13 @@ exports.errorMessages = {
 
   USER_DOES_NOT_EXIST: () => ({
     status: 404,
-    message: "User does not exist."
+    message: "User does not exist.",
   }),
-}
 
-exports.successMessages = {}
+  RATE_LIMIT_EXCEEDED: () => ({
+    status: 429,
+    message: "Too many requests. Please try again later.",
+  }),
+};
+
+exports.successMessages = {};
