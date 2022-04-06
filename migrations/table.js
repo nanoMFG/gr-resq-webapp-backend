@@ -1,8 +1,7 @@
 "use strict";
 
 const { dynamoDB, documentClient } = require("../config/db");
-const dbSchema = require("../schemas/db");
-const backoffInterval = 5000;
+const { backoffInterval } = require("../config/index");
 
 const checkTableStatus = async (tableName) => {
   try {
