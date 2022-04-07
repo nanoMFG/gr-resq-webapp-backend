@@ -2,14 +2,13 @@
 
 const { HTTPError, JWTError } = require("../../../utils/errors");
 const { errorMessages } = require("../../../utils/constants");
-const { verifyJWT } = require("../../../utils/index");
-const { dynamodb } = require("../../../config/db");
+const { verifyJWT, createKey } = require("../../../utils/index");
+const { dynamoDB, documentClient } = require("../../../config/db");
+const { tableName } = require("../../../config/index");
 
 const checkAuthentication = async (req, res, next) => {
   const authHeader =
-    req.headers["authorization"] ||
-    req.headers["x-access-token"] ||
-    req.query.token;
+    req.headers["authorization"] || req.headers["x-access-token"];
   const token =
     authHeader &&
     authHeader.split(" ")[0] === "Bearer" &&
@@ -29,19 +28,24 @@ const checkAuthentication = async (req, res, next) => {
     throw new JWTError(error.message);
   }
 
-  // TODO: add db query for finding user with userID, groupID.
-  const user = await dynamodb.findOne({
-    userID: JWTPayload.user_id,
-    groupID: JWTPayload.group_id,
-  });
+  const userPartitionKey = createKey(JWTPayload.sub.user_id, "user");
+  const { Item } = await documentClient
+    .get({
+      TableName: tableName,
+      Key: { partitionKey: userPartitionKey, sortKey: userPartitionKey },
+    })
+    .promise();
 
-  if (user === null) {
+  if (Item.length === 0) {
     const error = errorMessages.USER_DOES_NOT_EXIST;
     throw new HTTPError(error.status, error.message);
   }
 
   res.locals.isUserAuthenticated = true;
-  res.locals.token = JWTPayload;
+  res.locals.user = {
+    userPartitionKey,
+    groupRoles: JWTPayload.sub.group_roles,
+  };
   next();
 };
 

@@ -1,6 +1,6 @@
 "use strict";
 
-const dynamoose = require("dynamoose");
+const AWS = require("aws-sdk");
 const {
   region,
   endpoint,
@@ -8,12 +8,18 @@ const {
   secretAccessKey,
 } = require("../config/index");
 
-dynamoose.aws.sdk.config.update({
+const dynamoDB = new AWS.DynamoDB({
   accessKeyId: accessKeyID,
   secretAccessKey,
   region,
+  endpoint,
 });
 
-dynamoose.aws.ddb.local(endpoint);
+const documentClient = new AWS.DynamoDB.DocumentClient({
+  accessKeyId: accessKeyID,
+  secretAccessKey,
+  region,
+  endpoint,
+});
 
-module.exports = dynamoose;
+module.exports = { dynamoDB, documentClient };
