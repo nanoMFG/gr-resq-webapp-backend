@@ -3,15 +3,8 @@
 class HTTPError extends Error {
   constructor(statusCode, message) {
     super(message);
-    this.type = "HTTPError";
+    this.name = "HTTPError";
     this.statusCode = statusCode;
-  }
-}
-
-class JWTError extends Error {
-  constructor(message) {
-    super(message);
-    this.type = "JWTError";
   }
 }
 

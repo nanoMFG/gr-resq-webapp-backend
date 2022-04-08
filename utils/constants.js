@@ -13,7 +13,7 @@ exports.errorMessages = {
 
   BAD_REQUEST: () => ({
     status: 400,
-    message: "Missing or incorrect field TicketID.",
+    message: "Missing or incorrect field/header",
   }),
 
   SERVICE_TEMPORARILY_UNAVAILABLE: () => ({
@@ -28,12 +28,12 @@ exports.errorMessages = {
 
   INVALID_JWT: () => ({
     status: 401,
-    message: "Invalid JWT.",
+    message: "Authentication unsuccessful. Invalid JWT.",
   }),
 
   USER_DOES_NOT_EXIST: () => ({
-    status: 404,
-    message: "User does not exist.",
+    status: 401,
+    message: "Authentication unsuccessful. User does not exist.",
   }),
 
   RATE_LIMIT_EXCEEDED: () => ({
@@ -42,4 +42,10 @@ exports.errorMessages = {
   }),
 };
 
-exports.successMessages = {};
+exports.successMessages = {
+  LOGGED_IN_SUCCESSFULLY: (data) => ({
+    status: 200,
+    message: "Logged in successfully.",
+    data,
+  }),
+};

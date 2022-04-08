@@ -1,6 +1,6 @@
 "use strict";
 
-// const dynamoose = require("../config/db");
+const { generateNewJWT, verifyJWT } = require(".");
 const { dynamoDB, documentClient } = require("../config/db");
 const { createTable } = require("../migrations/table");
 const schema = require("../schemas/db");
@@ -36,14 +36,21 @@ const batchWrite = async () => {
 const getItem = async () => {
   const params = {
     TableName: "Entity",
-    IndexName: "EmailIndex",
-    KeyConditionExpression: "email = :email",
+    IndexName: "UsernameIndex",
+    KeyConditionExpression: "username :userName",
+    FilterExpression: "email = :email",
     ExpressionAttributeValues: {
-      ":email": "john.doe@gmail.com",
+      ":userName": "john.doe",
+      ":email": "john.doe@gmail.com"
     },
   };
-  const data = await documentClient.query(params).promise();
-  console.log(data);
+  try {
+    const data = await documentClient.query(params).promise();
+    console.log(data);
+  } catch(e) {
+    console.log(e.name, e.message);
+  }
+  
 };
 
 // describeTable("Entity");

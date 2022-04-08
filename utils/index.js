@@ -6,12 +6,10 @@ const { JWTSecret, JWTExpiryDuration } = require("../config/index");
 
 exports.verifyJWT = async (token) => await JWT.verify(token, JWTSecret);
 
-exports.generateJWT = async (username, groupRoles) => {
-  return await jwt.sign(
-    { user_id: username, group_roles: groupRoles },
-    JWTSecret,
-    { expiresIn: JWTExpiryDuration }
-  );
+exports.generateNewJWT = async (userID, userRoles) => {
+  return await JWT.sign({ userID, userRoles }, JWTSecret, {
+    expiresIn: JWTExpiryDuration,
+  });
 };
 
 exports.createKey = (identifier, entityType) => {
@@ -40,6 +38,6 @@ exports.createKey = (identifier, entityType) => {
 
 exports.getIdentifier = (key) => key.split("#")[1];
 
-exports.createUUID = () => shortUUID.generate();
+exports.generateNewUUID = () => shortUUID.generate();
 
 exports.getISODateTime = new Date(Date.now()).toISOString();
