@@ -44,8 +44,8 @@ app.use("*", (req, res, next) => {
   try {
     const error = errorMessages.RESOURCE_NOT_FOUND();
     throw new HTTPError(error.status, error.message);
-  } catch (error) {
-    return next(error);
+  } catch (err) {
+    return next(err);
   }
 });
 

@@ -3,7 +3,7 @@
 exports.errorHandler = (err, req, res, next) => {
   let error;
 
-  if (err.type === "HTTPError") {
+  if (err.name === "HTTPError") {
     error = {
       status: err.statusCode,
       message: err.message,
