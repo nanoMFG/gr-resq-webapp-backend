@@ -14,7 +14,7 @@ const checkAuthentication = async (req, res, next) => {
     authHeader.split(" ")[0] === "Bearer" &&
     authHeader.split(" ")[1];
 
-  if (token == null) {
+  if (token === null) {
     const error = errorMessages.AUTHENTICATION_UNSUCESSFUL;
     throw new HTTPError(error.status, error.message);
   }
@@ -28,9 +28,9 @@ const checkAuthentication = async (req, res, next) => {
     throw new JWTError(error.message);
   }
 
-  const userPartitionKey = createKey(JWTPayload.sub.user_id, "user");
+  const userPartitionKey = createKey(JWTPayload.sub.userID, "user");
   const { Item } = await documentClient
-    .get({
+    .query({
       TableName: tableName,
       Key: { partitionKey: userPartitionKey, sortKey: userPartitionKey },
     })
@@ -44,7 +44,7 @@ const checkAuthentication = async (req, res, next) => {
   res.locals.isUserAuthenticated = true;
   res.locals.user = {
     userPartitionKey,
-    groupRoles: JWTPayload.sub.group_roles,
+    userRoles: JWTPayload.sub.userRoles,
   };
   next();
 };

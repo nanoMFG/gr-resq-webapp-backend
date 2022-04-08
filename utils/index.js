@@ -6,9 +6,9 @@ const { JWTSecret, JWTExpiryDuration } = require("../config/index");
 
 exports.verifyJWT = async (token) => await JWT.verify(token, JWTSecret);
 
-exports.generateJWT = async (userID, groupID, role) => {
+exports.generateJWT = async (username, groupRoles) => {
   return await jwt.sign(
-    { user_id: userID, group_id: groupID, role },
+    { user_id: username, group_roles: groupRoles },
     JWTSecret,
     { expiresIn: JWTExpiryDuration }
   );
