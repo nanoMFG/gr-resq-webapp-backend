@@ -39,6 +39,7 @@ module.exports = {
   APIVersion: process.env.API_VERSION,
   JWTSecret: process.env.JWT_SECRET,
   JWTExpiryDuration: Number(process.env.JWT_EXPIRY_DURATION) || 86400,
+  salt: process.env.SALT,
   region: process.env.REGION,
   endpoint: process.env.ENDPOINT,
   accessKeyID: process.env.ACCESS_KEY_ID,

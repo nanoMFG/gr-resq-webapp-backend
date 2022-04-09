@@ -2,10 +2,10 @@
 
 const express = require("express");
 const router = express.Router();
-const authHandler = require("../handlers/auth");
+const { handleUserSignIn, handleUserSignUp } = require("../handlers/auth");
 
-router.post("/login", authHandler.handleLogIn);
+router.post("/sign-in", handleUserSignIn);
 
-router.post("/logout", authHandler.handleLogOut);
+router.post("/sign-up", handleUserSignUp);
 
 module.exports = router;

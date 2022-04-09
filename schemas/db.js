@@ -22,14 +22,6 @@ const dbSchema = {
       AttributeType: "S",
     },
     {
-      AttributeName: "userID",
-      AttributeType: "B",
-    },
-    {
-      AttributeName: "username",
-      AttributeType: "S",
-    },
-    {
       AttributeName: "email",
       AttributeType: "S",
     },
@@ -62,10 +54,6 @@ const dbSchema = {
       AttributeType: "S",
     },
     {
-      AttributeName: "groupID",
-      AttributeType: "B",
-    },
-    {
       AttributeName: "groupName",
       AttributeType: "S",
     },
@@ -76,10 +64,6 @@ const dbSchema = {
     {
       AttributeName: "isGroupPrivate",
       AttributeType: "S",
-    },
-    {
-      AttributeName: "experimentID",
-      AttributeType: "N",
     },
     {
       AttributeName: "isExperimentPrivate",
@@ -96,22 +80,6 @@ const dbSchema = {
       KeySchema: [
         {
           AttributeName: "email",
-          KeyType: "HASH",
-        },
-      ],
-      Projection: {
-        ProjectionType: "ALL",
-      },
-      ProvisionedThroughput: {
-        ReadCapacityUnits: 10,
-        WriteCapacityUnits: 10,
-      },
-    },
-    {
-      IndexName: "UsernameIndex",
-      KeySchema: [
-        {
-          AttributeName: "username",
           KeyType: "HASH",
         },
       ],

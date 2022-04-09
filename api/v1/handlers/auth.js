@@ -4,42 +4,50 @@ const { documentClient } = require("../../../config/db");
 const { tableName } = require("../../../config/index");
 const { errorMessages, successMessages } = require("../../../utils/constants");
 const { HTTPError } = require("../../../utils/errors");
-const { createKey, generateNewJWT } = require("../../../utils/index");
+const {
+  createKey,
+  generateNewJWT,
+  comparePasswordHash,
+  generateNewUUID,
+  hashPassword,
+  getISODateTime,
+} = require("../../../utils/index");
 
-module.exports = {
-  handleLogIn: async (req, res, next) => {
+exports.handleUserSignIn = async (req, res, next) => {
+  try {
     const userData = req.body;
 
-    // TODO: add AJV validation schema
+    // TODO: validate with AJV schema
     let queryParams = {
       TableName: tableName,
-    };
-
-    if (userData.hasOwnProperty("username")) {
-      queryParams.IndexName = "UsernameIndex";
-      queryParams.KeyConditionExpression = "username = :username";
-      queryParams.FilterExpression = "entityType = :entityType";
-      queryParams.ExpressionAttributeValues = {
-        ":username": `${userData.username}`,
-        ":entityType": "user",
-      };
-    } else if (userData.hasOwnProperty("email")) {
-      queryParams.IndexName = "EmailIndex";
-      queryParams.KeyConditionExpression = "email = :email";
-      queryParams.ExpressionAttributeValues = {
+      IndexName: "EmailIndex",
+      KeyConditionExpression: "email = :email",
+      FilterExpression: "entityType = :entityType",
+      ExpressionAttributeValues: {
         ":email": `${userData.email}`,
         ":entityType": "user",
-      };
-    }
+      },
+    };
 
     const { Item } = await documentClient.query(queryParams).promise();
 
     if (Item.length === 0) {
-      const error = errorMessages.USER_DOES_NOT_EXIST;
+      const error = errorMessages.USER_DOES_NOT_EXIST();
+      throw new HTTPError(error.status, error.message);
+    }
+
+    const checkPassword = await comparePasswordHash(
+      userData.password,
+      Item.passwordHash
+    );
+
+    if (checkPassword === false) {
+      const error = errorMessages.INVALID_CREDENTIALS();
       throw new HTTPError(error.status, error.message);
     }
 
     const userPartitionKey = createKey(Item.userID, "user");
+
     queryParams = {
       TableName: tableName,
       KeyConditionExpression:
@@ -56,9 +64,7 @@ module.exports = {
 
     if (Items.length > 0) {
       Items.forEach((groupData) => {
-        groupID = groupData.groupID;
-        groupRole = groupData.groupRole;
-        userRoles.groupID = groupRole;
+        userRoles[groupData.groupID] = groupData.groupRole;
       });
     }
 
@@ -68,9 +74,79 @@ module.exports = {
       accessToken: newJWT,
     });
     return res.status(response.status).send(response);
-  },
+  } catch (err) {
+    if (err.name === "HTTPError") {
+      return next(err);
+    }
 
-  handleLogOut: async (req, res, next) => {
-    return res.send({ message: "hello logout" });
-  },
+    const error = errorMessages.INTERNAL_SERVER_ERROR();
+    return next(error);
+  }
+};
+
+exports.handleUserSignUp = async (req, res, next) => {
+  try {
+    const userData = req.body;
+
+    // TODO: validate using AJV schema
+    let queryParams = {
+      TableName: tableName,
+      IndexName: "EmailIndex",
+      KeyConditionExpression: "email = :email",
+      FilterExpression: "entityType = :entityType",
+      ExpressionAttributeValues: {
+        ":email": userData.email,
+        ":entityType": "user",
+      },
+    };
+
+    const { Item } = await documentClient.query(queryParams).promise();
+
+    if (Item.length !== 0) {
+      const error = errorMessages.USER_ALREADY_EXISTS();
+      throw new HTTPError(error.status, error.message);
+    }
+
+    const newUserID = generateNewUUID();
+    const newUserPartitionKey = createKey(newUserID, "user");
+    const ISODateTime = getISODateTime();
+
+    queryParams = {
+      TableName: tableName,
+      Item: {
+        entityType: "user",
+        partitionKey: newUserPartitionKey,
+        sortKey: newUserPartitionKey,
+        email: userData.email,
+        passwordHash: await hashPassword(userData.password),
+        createdAt: ISODateTime,
+        updatedAt: ISODateTime,
+      },
+    };
+
+    userData.firstName && (userQueryParams.Item.firstName = userData.firstName);
+    userData.lastName && (userQueryParams.Item.lastName = userData.lastName);
+    userData.institutionName &&
+      (userQueryParams.Item.institutionName = userData.institutionName);
+    userData.institutionDomain &&
+      (userQueryParams.Item.institutionDomain = userData.institutionDomain);
+    userData.institutionCountry &&
+      (userQueryParams.Item.institutionCountry = userData.institutionCountry);
+
+    await documentClient.put(queryParams).promise();
+
+    const newJWT = await generateNewJWT(newUserID, {});
+    const response = successMessages.USER_REGISTERED_SUCCESSFULLY({
+      tokenType: "Bearer",
+      accessToken: newJWT,
+    });
+    return res.status(response.status).send(response);
+  } catch (err) {
+    if (err.name === "HTTPError") {
+      return next(err);
+    }
+
+    const error = errorMessages.INTERNAL_SERVER_ERROR();
+    return next(error);
+  }
 };
