@@ -31,9 +31,19 @@ exports.errorMessages = {
     message: "Authentication unsuccessful. Invalid JWT.",
   }),
 
+  INVALID_CREDENTIALS: () => ({
+    status: 401,
+    message: "Invalid username/email or password."
+  }),
+
   USER_DOES_NOT_EXIST: () => ({
     status: 401,
     message: "Authentication unsuccessful. User does not exist.",
+  }),
+
+  USER_ALREADY_EXISTS: () => ({
+    status: 422,
+    message: "Registration unsuccessful. User already exists."
   }),
 
   RATE_LIMIT_EXCEEDED: () => ({
@@ -45,6 +55,12 @@ exports.errorMessages = {
 exports.successMessages = {
   LOGGED_IN_SUCCESSFULLY: (data) => ({
     status: 200,
+    message: "Logged in successfully.",
+    data,
+  }),
+
+  USER_REGISTERED_SUCCESSFULLY: (data) => ({
+    status: 201,
     message: "Logged in successfully.",
     data,
   }),

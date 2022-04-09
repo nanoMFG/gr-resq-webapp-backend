@@ -2,7 +2,8 @@
 
 const shortUUID = require("short-uuid");
 const JWT = require("jsonwebtoken");
-const { JWTSecret, JWTExpiryDuration } = require("../config/index");
+const bcrypt = require("bcrypt");
+const { JWTSecret, JWTExpiryDuration, salt } = require("../config/index");
 
 exports.verifyJWT = async (token) => await JWT.verify(token, JWTSecret);
 
@@ -40,4 +41,12 @@ exports.getIdentifier = (key) => key.split("#")[1];
 
 exports.generateNewUUID = () => shortUUID.generate();
 
-exports.getISODateTime = new Date(Date.now()).toISOString();
+exports.hashPassword = async (plainTextPassword) => {
+  return await bcrypt.hash(plainTextPassword, salt);
+};
+
+exports.comparePasswordHash = async (plainTextPassword, hashedPassword) => {
+  return await bcrypt.compare(plainTextPassword, hashedPassword);
+};
+
+exports.getISODateTime = () => new Date(Date.now()).toISOString();
