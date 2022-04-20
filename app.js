@@ -3,7 +3,7 @@
 // TODO:
 // - add validation using AJV.js
 // - add logger using winston
-// - add AWS CloudFormation templates for creating DDB tables
+// - add AWS CloudFormation templates for creating DDB table
 
 const express = require("express");
 const app = express();

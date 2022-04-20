@@ -1,7 +1,36 @@
 "use strict";
 
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const experimentsHandler = require("../handlers/experiments");
+const {
+  handleCreateExperiment,
+  handleGetExperimentByExperimentID,
+  handleUpdateExperimentByExperimentID,
+  handleDeleteExperimentByExperimentID,
+  handleQueryExperiments,
+} = require("../handlers/experiments");
+const checkAuthentication = require("../middleware/authentication");
+
+router.post("/create-experiment", checkAuthentication, handleCreateExperiment);
+
+router.get(
+  "/get-experiment/:experimentID",
+  checkAuthentication,
+  handleGetExperimentByExperimentID
+);
+
+router.post("/query-experiments", checkAuthentication, handleQueryExperiments);
+
+router.put(
+  "/update-experiment/:experimentID",
+  checkAuthentication,
+  handleUpdateExperimentByExperimentID
+);
+
+router.delete(
+  "/delete-experiment/:experimentID",
+  checkAuthentication,
+  handleDeleteExperimentByExperimentID
+);
 
 module.exports = router;

@@ -12,7 +12,7 @@ const checkAuthentication = async (req, res, next) => {
       req.headers["authorization"] || req.headers["x-access-token"];
     const token = authHeader && authHeader.split(" ")[0] === "Bearer";
 
-    if (token === null) {
+    if (!token) {
       const error = errorMessages.BAD_REQUEST();
       throw new HTTPError(error.status, error.message);
     }

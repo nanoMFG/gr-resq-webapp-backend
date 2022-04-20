@@ -38,6 +38,10 @@ const dbSchema = {
       AttributeType: "S",
     },
     {
+      AttributeName: "authorID",
+      AttributeType: "S"
+    },
+    {
       AttributeName: "passwordHash",
       AttributeType: "B",
     },
@@ -47,10 +51,6 @@ const dbSchema = {
     },
     {
       AttributeName: "institutionDomain",
-      AttributeType: "S",
-    },
-    {
-      AttributeName: "institutionCountry",
       AttributeType: "S",
     },
     {

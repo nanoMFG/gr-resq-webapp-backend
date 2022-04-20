@@ -13,7 +13,7 @@ exports.errorMessages = {
 
   BAD_REQUEST: () => ({
     status: 400,
-    message: "Missing or incorrect field/header",
+    message: "Missing or incorrect field/header/querystring",
   }),
 
   SERVICE_TEMPORARILY_UNAVAILABLE: () => ({
@@ -61,7 +61,13 @@ exports.successMessages = {
 
   USER_REGISTERED_SUCCESSFULLY: (data) => ({
     status: 201,
-    message: "Logged in successfully.",
+    message: "Registered successfully.",
+    data,
+  }),
+
+  USER_RETRIEVED_SUCCESSFULLY: (data) => ({
+    status: 200,
+    message: "User retrieved successfully.",
     data,
   }),
 };

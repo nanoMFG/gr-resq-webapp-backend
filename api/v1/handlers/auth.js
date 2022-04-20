@@ -124,14 +124,14 @@ exports.handleUserSignUp = async (req, res, next) => {
       },
     };
 
-    userData.firstName && (userQueryParams.Item.firstName = userData.firstName);
-    userData.lastName && (userQueryParams.Item.lastName = userData.lastName);
+    userData.firstName && (queryParams.Item.firstName = userData.firstName);
+    userData.lastName && (queryParams.Item.lastName = userData.lastName);
     userData.institutionName &&
-      (userQueryParams.Item.institutionName = userData.institutionName);
+      (queryParams.Item.institutionName = userData.institutionName);
     userData.institutionDomain &&
-      (userQueryParams.Item.institutionDomain = userData.institutionDomain);
+      (queryParams.Item.institutionDomain = userData.institutionDomain);
     userData.institutionCountry &&
-      (userQueryParams.Item.institutionCountry = userData.institutionCountry);
+      (queryParams.Item.institutionCountry = userData.institutionCountry);
 
     await documentClient.put(queryParams).promise();
 
