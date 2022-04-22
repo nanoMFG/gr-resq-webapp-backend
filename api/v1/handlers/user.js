@@ -59,7 +59,7 @@ exports.handleGetUserProfile = async (req, res, next) => {
   }
 };
 
-exports.handleUpdateUser = async (req, res, next) => {
+exports.handleUpdateUserByUserID = async (req, res, next) => {
   try {
     const userID = req.params.userID;
 
@@ -117,7 +117,7 @@ exports.handleUpdateUser = async (req, res, next) => {
   }
 };
 
-exports.handleDeleteUser = async (req, res, next) => {
+exports.handleDeleteUserByUserID = async (req, res, next) => {
   try {
     const userID = req.params.userID;
 

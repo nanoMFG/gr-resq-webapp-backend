@@ -5,8 +5,6 @@ const router = express.Router();
 const checkAuthentication = require("../middleware/authentication");
 const {
   handleGetUserProfile,
-  handleGetUserGroupsByUserID,
-  handleGetUserExperimentsByUserID,
   handleUpdateUserByUserID,
   handleDeleteUserByUserID,
 } = require("../handlers/user");
