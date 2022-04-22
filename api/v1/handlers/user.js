@@ -4,6 +4,7 @@ const { createKey } = require("../../../utils/index");
 const { tableName } = require("../../../config/index");
 const { errorMessages, successMessages } = require("../../../utils/constants");
 const { HTTPError } = require("../../../utils/errors");
+const { documentClient } = require("../../../config/db");
 
 exports.handleGetUserProfile = async (req, res, next) => {
   try {
@@ -58,10 +59,54 @@ exports.handleGetUserProfile = async (req, res, next) => {
   }
 };
 
-
-
 exports.handleUpdateUser = async (req, res, next) => {
   try {
+    const userID = req.params.userID;
+
+    // TODO: validate userID with AJS
+    if (!userID) {
+      const error = errorMessages.BAD_REQUEST();
+      throw new HTTPError(error.status, error.message);
+    }
+
+    const reqUserPartitionKey = createKey(req.params.userID, "user");
+
+    if (reqUserPartitionKey !== res.locals.userPartitionKey) {
+      const error = errorMessages.NOT_AUTHORIZED();
+      throw new HTTPError(error.status, error.message);
+    }
+
+    const newUserData = {};
+
+    req.body.firstName && (newUserData.firstName = req.body.firstName);
+    req.body.lastName && (newUserData.lastName = req.body.lastName);
+    req.body.institutionName &&
+      (newUserData.institutionName = req.body.institutionName);
+    req.body.institutionDomain &&
+      (newUserData.institutionDomain = req.body.institutionDomain);
+
+    let updateString = "set";
+    let ExpressionAttributeValues = {};
+
+    Object.keys(newUserData).forEach((key) => {
+      updateString += ` ${key} = :${key}`;
+      ExpressionAttributeValues[`:${key}`] = newUserData[key];
+    });
+
+    const queryParams = {
+      TableName: tableName,
+      Key: {
+        partitionKey: res.locals.userPartitionKey,
+        sortKey: res.locals.userPartitionKey,
+      },
+      UpdateExpression: updateString,
+      ExpressionAttributeValues,
+      ReturnValues: "ALL_NEW",
+    };
+    await documentClient.update(queryParams).promise();
+
+    const response = successMessages.USER_UPDATED_SUCCESSFULLY();
+    return res.status(response.status).send(response);
   } catch (err) {
     if (err.name === "HTTPError") {
       return next(err);
@@ -74,6 +119,33 @@ exports.handleUpdateUser = async (req, res, next) => {
 
 exports.handleDeleteUser = async (req, res, next) => {
   try {
+    const userID = req.params.userID;
+
+    // TODO: validate userID with AJS
+    if (!userID) {
+      const error = errorMessages.BAD_REQUEST();
+      throw new HTTPError(error.status, error.message);
+    }
+
+    const reqUserPartitionKey = createKey(req.params.userID, "user");
+
+    if (reqUserPartitionKey !== res.locals.userPartitionKey) {
+      const error = errorMessages.NOT_AUTHORIZED();
+      throw new HTTPError(error.status, error.message);
+    }
+
+    const queryParams = {
+      TableName: tableName,
+      Key: {
+        partitionKey: res.locals.userPartitionKey,
+        sortKey: res.locals.userPartitionKey,
+      },
+    };
+
+    await documentClient.delete(queryParams).promise();
+
+    const response = successMessages.USER_DELETED_SUCCESSFULLY();
+    return res.status(response.status).send(response);
   } catch (err) {
     if (err.name === "HTTPError") {
       return next(err);

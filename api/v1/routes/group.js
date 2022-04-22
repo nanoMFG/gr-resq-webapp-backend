@@ -14,6 +14,8 @@ router.post("/create-group", checkAuthentication, handleCreateGroup);
 
 router.get("/get-group/:groupID", checkAuthentication, handleGetGroupByGroupID);
 
+router.get("/get-user-groups/:userID", checkAuthentication, handleGetUserGroupsByUserID);
+
 router.put("/update-group/:groupID", checkAuthentication, handleUpdateGroupByGroupID);
 
 router.delete("/delete-group/:groupID", checkAuthentication, handleDeleteGroupByGroupID);

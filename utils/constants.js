@@ -6,6 +6,11 @@ exports.errorMessages = {
     message: "Authentication unsuccessful.",
   }),
 
+  NOT_AUTHORIZED: () => ({
+    status: 403,
+    message: "User is unauthorized to perform this action."
+  }),
+
   RESOURCE_NOT_FOUND: () => ({
     status: 404,
     message: "Requested resource was not found.",
@@ -69,5 +74,15 @@ exports.successMessages = {
     status: 200,
     message: "User retrieved successfully.",
     data,
+  }),
+
+  USER_UPDATED_SUCCESSFULLY: () => ({
+    status: 204,
+    message: "User updated successfully."
+  }),
+
+  USER_DELETED_SUCCESSFULLY: () => ({
+    status: 204,
+    message: "User delted successfully."
   }),
 };

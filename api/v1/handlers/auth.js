@@ -130,8 +130,6 @@ exports.handleUserSignUp = async (req, res, next) => {
       (queryParams.Item.institutionName = userData.institutionName);
     userData.institutionDomain &&
       (queryParams.Item.institutionDomain = userData.institutionDomain);
-    userData.institutionCountry &&
-      (queryParams.Item.institutionCountry = userData.institutionCountry);
 
     await documentClient.put(queryParams).promise();
 

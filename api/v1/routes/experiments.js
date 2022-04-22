@@ -19,6 +19,8 @@ router.get(
   handleGetExperimentByExperimentID
 );
 
+router.get("/get-user-experiments/:userID", checkAuthentication, handleGetUserExperimentsByUserID);
+
 router.post("/query-experiments", checkAuthentication, handleQueryExperiments);
 
 router.put(
