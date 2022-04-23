@@ -58,16 +58,20 @@ const dbSchema = {
       AttributeType: "S",
     },
     {
-      AttributeName: "groupRole",
+      AttributeName: "role",
       AttributeType: "S",
+    },
+    {
+      AttributeName: "isRoleApproved",
+      AttributeType: "BOOL",
     },
     {
       AttributeName: "isGroupPrivate",
-      AttributeType: "S",
+      AttributeType: "BOOL",
     },
     {
       AttributeName: "isExperimentPrivate",
-      AttributeType: "S",
+      AttributeType: "BOOL",
     },
   ],
   ProvisionedThroughput: {
@@ -81,6 +85,26 @@ const dbSchema = {
         {
           AttributeName: "email",
           KeyType: "HASH",
+        },
+      ],
+      Projection: {
+        ProjectionType: "ALL",
+      },
+      ProvisionedThroughput: {
+        ReadCapacityUnits: 10,
+        WriteCapacityUnits: 10,
+      },
+    },
+    {
+      IndexName: "InvertedIndex",
+      KeySchema: [
+        {
+          AttributeName: "sortKey",
+          KeyType: "HASH",
+        },
+        {
+          AttributeName: "partitionKey",
+          KeyType: "RANGE",
         },
       ],
       Projection: {

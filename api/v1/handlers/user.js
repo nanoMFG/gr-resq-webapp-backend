@@ -5,6 +5,13 @@ const { tableName } = require("../../../config/index");
 const { errorMessages, successMessages } = require("../../../utils/constants");
 const { HTTPError } = require("../../../utils/errors");
 const { documentClient } = require("../../../config/db");
+const { roles } = require("../../../config/index");
+
+exports.handleAssignUserRole = async (req, res, next) => {};
+
+exports.handleApproveUserRole = async (req, res, next) => {};
+
+exports.handleRemoveUserRole = async (req, res, next) => {};
 
 exports.handleGetUserProfile = async (req, res, next) => {
   try {

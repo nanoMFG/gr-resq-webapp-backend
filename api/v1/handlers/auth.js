@@ -6,6 +6,7 @@ const { errorMessages, successMessages } = require("../../../utils/constants");
 const { HTTPError } = require("../../../utils/errors");
 const {
   createKey,
+  getIdentifier,
   generateNewJWT,
   comparePasswordHash,
   generateNewUUID,
@@ -63,8 +64,11 @@ exports.handleUserSignIn = async (req, res, next) => {
     let userRoles = {};
 
     if (Items.length > 0) {
-      Items.forEach((groupData) => {
-        userRoles[groupData.groupID] = groupData.groupRole;
+      Items.forEach(groupData => {
+        if (groupData.isRoleApproved) {
+          const groupID = getIdentifier(groupData.partitionKey)
+          userRoles[groupID] = groupData.role;
+        }
       });
     }
 
@@ -109,29 +113,66 @@ exports.handleUserSignUp = async (req, res, next) => {
 
     const newUserID = generateNewUUID();
     const newUserPartitionKey = createKey(newUserID, "user");
+    const newGroupPartitionKey = createKey(newUserID, "group");
     const ISODateTime = getISODateTime();
 
+    const userUserItem = {
+      entityType: "user",
+      partitionKey: newUserPartitionKey,
+      sortKey: newUserPartitionKey,
+      email: userData.email,
+      passwordHash: await hashPassword(userData.password),
+      createdAt: ISODateTime,
+      updatedAt: ISODateTime,
+    };
+
+    userData.firstName && (userUserItem.Item.firstName = userData.firstName);
+    userData.lastName && (userUserItem.Item.lastName = userData.lastName);
+    userData.institutionName &&
+      (userUserItem.Item.institutionName = userData.institutionName);
+    userData.institutionDomain &&
+      (userUserItem.Item.institutionDomain = userData.institutionDomain);
+
+    const userGroupItem = {
+      entityType: "group",
+      partitionKey: newUserPartitionKey,
+      sortKey: newGroupPartitionKey,
+      groupName: `${newGroupPartitionKey}_name`,
+      role: "basic",
+      isRoleApproved: true,
+      isGroupPrivate: true,
+      createdAt: ISODateTime,
+      updatedAt: ISODateTime,
+    };
+
+    const groupGroupItem = userGroupItem;
+    groupGroupItem.partitionKey = newGroupPartitionKey
+    delete groupGroupItem.role;
+    delete groupGroupItem.isRoleApproved;
+
     queryParams = {
-      TableName: tableName,
-      Item: {
-        entityType: "user",
-        partitionKey: newUserPartitionKey,
-        sortKey: newUserPartitionKey,
-        email: userData.email,
-        passwordHash: await hashPassword(userData.password),
-        createdAt: ISODateTime,
-        updatedAt: ISODateTime,
+      RequestItems: {
+        [tableName]: [
+          {
+            PutRequest: {
+              Item: userUserItem,
+            },
+          },
+          {
+            PutRequest: {
+              Item: userGroupItem,
+            },
+          },
+          {
+            PutRequest: {
+              Item: groupGroupItem,
+            },
+          },
+        ],
       },
     };
 
-    userData.firstName && (queryParams.Item.firstName = userData.firstName);
-    userData.lastName && (queryParams.Item.lastName = userData.lastName);
-    userData.institutionName &&
-      (queryParams.Item.institutionName = userData.institutionName);
-    userData.institutionDomain &&
-      (queryParams.Item.institutionDomain = userData.institutionDomain);
-
-    await documentClient.put(queryParams).promise();
+    await documentClient.batchWrite(queryParams).promise();
 
     const newJWT = await generateNewJWT(newUserID, {});
     const response = successMessages.USER_REGISTERED_SUCCESSFULLY({
