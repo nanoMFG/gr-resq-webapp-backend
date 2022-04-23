@@ -141,15 +141,48 @@ exports.handleDeleteUserByUserID = async (req, res, next) => {
       throw new HTTPError(error.status, error.message);
     }
 
-    const queryParams = {
+    let queryParams = {
       TableName: tableName,
-      Key: {
-        partitionKey: res.locals.userPartitionKey,
-        sortKey: res.locals.userPartitionKey,
+      KeyConditionExpression:
+        "partitionKey = :userPartitionKey AND begins_with(sortKey, :groupSortKey)",
+      FilterExpression: "entityType = :entityType",
+      ExpressionAttributeValues: {
+        ":userPartitionKey": res.locals.userPartitionKey,
+        ":groupSortKey": "group",
+        ":entityType": "group",
+      },
+    };
+    const { Items } = await documentClient.query(queryParams).promise();
+
+    const userGroupBatch = [];
+
+    Items.forEach((groupData) => {
+      userGroupBatch.push({
+        DeleteRequest: {
+          Key: {
+            partitionKey: res.locals.userPartitionKey,
+            sortKey: groupData.sortKey,
+          },
+        },
+      });
+    });
+
+    userGroupBatch.push({
+      DeleteRequest: {
+        Key: {
+          partitionKey: res.locals.userPartitionKey,
+          sortKey: res.locals.userPartitionKey,
+        },
+      },
+    });
+
+    queryParams = {
+      RequestItems: {
+        [tableName]: userGroupBatch,
       },
     };
 
-    await documentClient.delete(queryParams).promise();
+    await documentClient.batchWrite(queryParams).promise();
 
     const response = successMessages.USER_DELETED_SUCCESSFULLY();
     return res.status(response.status).send(response);

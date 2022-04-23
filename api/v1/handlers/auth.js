@@ -64,9 +64,9 @@ exports.handleUserSignIn = async (req, res, next) => {
     let userRoles = {};
 
     if (Items.length > 0) {
-      Items.forEach(groupData => {
+      Items.forEach((groupData) => {
         if (groupData.isRoleApproved) {
-          const groupID = getIdentifier(groupData.partitionKey)
+          const groupID = getIdentifier(groupData.partitionKey);
           userRoles[groupID] = groupData.role;
         }
       });
@@ -146,7 +146,7 @@ exports.handleUserSignUp = async (req, res, next) => {
     };
 
     const groupGroupItem = userGroupItem;
-    groupGroupItem.partitionKey = newGroupPartitionKey
+    groupGroupItem.partitionKey = newGroupPartitionKey;
     delete groupGroupItem.role;
     delete groupGroupItem.isRoleApproved;
 
@@ -174,7 +174,11 @@ exports.handleUserSignUp = async (req, res, next) => {
 
     await documentClient.batchWrite(queryParams).promise();
 
-    const newJWT = await generateNewJWT(newUserID, {});
+    const userRoles = {
+      [newUserID]: "basic",
+    };
+
+    const newJWT = await generateNewJWT(newUserID, userRoles);
     const response = successMessages.USER_REGISTERED_SUCCESSFULLY({
       tokenType: "Bearer",
       accessToken: newJWT,
