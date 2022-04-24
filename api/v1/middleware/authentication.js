@@ -25,7 +25,7 @@ const checkAuthentication = async (req, res, next) => {
     };
     const { Item } = await documentClient.get(queryParams).promise();
 
-    if (Item.length === 0) {
+    if (Item === null) {
       const error = errorMessages.USER_DOES_NOT_EXIST();
       throw new HTTPError(error.status, error.message);
     }

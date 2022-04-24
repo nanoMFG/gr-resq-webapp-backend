@@ -3,7 +3,13 @@
 const shortUUID = require("short-uuid");
 const JWT = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const { JWTSecret, JWTExpiryDuration, salt } = require("../config/index");
+const {
+  JWTSecret,
+  JWTExpiryDuration,
+  salt,
+  senderEmail,
+} = require("../config/index");
+const { ses } = require("../config/emailer");
 
 exports.verifyJWT = async (token) => await JWT.verify(token, JWTSecret);
 
@@ -50,3 +56,26 @@ exports.comparePasswordHash = async (plainTextPassword, hashedPassword) => {
 };
 
 exports.getISODateTime = () => new Date(Date.now()).toISOString();
+
+exports.sendEmail = async (recipientEmails, groupDetails, Role) => {
+  const params = {
+    Source: senderEmail,
+    Destination: {
+      ToAddresses: recipientEmails,
+    },
+    ReplyToAddresses: [],
+    Message: {
+      Body: {
+        Html: {
+          Charset: "UTF-8",
+          Data: `<button>Click here to approve role</button>`,
+        },
+      },
+      Subject: {
+        Charset: "UTF-8",
+        Data: `Request for role change`,
+      },
+    },
+  };
+  return await ses.sendEmail(params).promise();
+};

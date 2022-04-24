@@ -58,12 +58,8 @@ const dbSchema = {
       AttributeType: "S",
     },
     {
-      AttributeName: "role",
+      AttributeName: "groupRole",
       AttributeType: "S",
-    },
-    {
-      AttributeName: "isRoleApproved",
-      AttributeType: "BOOL",
     },
     {
       AttributeName: "isGroupPrivate",

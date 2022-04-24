@@ -32,7 +32,7 @@ exports.handleUserSignIn = async (req, res, next) => {
 
     const { Item } = await documentClient.query(queryParams).promise();
 
-    if (Item.length === 0) {
+    if (Item === null) {
       const error = errorMessages.USER_DOES_NOT_EXIST();
       throw new HTTPError(error.status, error.message);
     }
@@ -65,10 +65,8 @@ exports.handleUserSignIn = async (req, res, next) => {
 
     if (Items.length > 0) {
       Items.forEach((groupData) => {
-        if (groupData.isRoleApproved) {
-          const groupID = getIdentifier(groupData.partitionKey);
-          userRoles[groupID] = groupData.role;
-        }
+        const groupID = getIdentifier(groupData.partitionKey);
+        userRoles[groupID] = groupData.groupRole;
       });
     }
 
@@ -106,7 +104,7 @@ exports.handleUserSignUp = async (req, res, next) => {
 
     const { Item } = await documentClient.query(queryParams).promise();
 
-    if (Item.length !== 0) {
+    if (Item !== null) {
       const error = errorMessages.USER_ALREADY_EXISTS();
       throw new HTTPError(error.status, error.message);
     }
@@ -138,7 +136,7 @@ exports.handleUserSignUp = async (req, res, next) => {
       partitionKey: newUserPartitionKey,
       sortKey: newGroupPartitionKey,
       groupName: `${newGroupPartitionKey}_name`,
-      role: "basic",
+      groupRole: "basic",
       isRoleApproved: true,
       isGroupPrivate: true,
       createdAt: ISODateTime,
@@ -147,7 +145,7 @@ exports.handleUserSignUp = async (req, res, next) => {
 
     const groupGroupItem = userGroupItem;
     groupGroupItem.partitionKey = newGroupPartitionKey;
-    delete groupGroupItem.role;
+    delete groupGroupItem.groupRole;
     delete groupGroupItem.isRoleApproved;
 
     queryParams = {

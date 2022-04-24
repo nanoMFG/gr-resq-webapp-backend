@@ -8,7 +8,7 @@ exports.errorMessages = {
 
   NOT_AUTHORIZED: () => ({
     status: 403,
-    message: "User is unauthorized to perform this action."
+    message: "User is unauthorized to perform this action.",
   }),
 
   RESOURCE_NOT_FOUND: () => ({
@@ -38,7 +38,7 @@ exports.errorMessages = {
 
   INVALID_CREDENTIALS: () => ({
     status: 401,
-    message: "Invalid username/email or password."
+    message: "Invalid username/email or password.",
   }),
 
   USER_DOES_NOT_EXIST: () => ({
@@ -48,7 +48,17 @@ exports.errorMessages = {
 
   USER_ALREADY_EXISTS: () => ({
     status: 422,
-    message: "Registration unsuccessful. User already exists."
+    message: "Registration unsuccessful. User already exists.",
+  }),
+
+  USER_GROUP_ROLE_ALREADY_EXISTS: () => ({
+    status: 422,
+    message: "User with group role already exists.",
+  }),
+
+  GROUP_DOES_NOT_EXIST: () => ({
+    status: 404,
+    message: "Group does not exist.",
   }),
 
   RATE_LIMIT_EXCEEDED: () => ({
@@ -78,11 +88,21 @@ exports.successMessages = {
 
   USER_UPDATED_SUCCESSFULLY: () => ({
     status: 204,
-    message: "User updated successfully."
+    message: "User updated successfully.",
   }),
 
   USER_DELETED_SUCCESSFULLY: () => ({
     status: 204,
-    message: "User delted successfully."
+    message: "User delted successfully.",
+  }),
+
+  USER_ROLE_ASSIGNMENT_REQUEST_SUBMITTED: () => ({
+    status: 200,
+    message: "User role assignment request submitted successfully.",
+  }),
+
+  USER_ROLE_ASSIGNED_SUCCESSFULLY: () => ({
+    status: 200,
+    message: "User role assigned successfully.",
   }),
 };

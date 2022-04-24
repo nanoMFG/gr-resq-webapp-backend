@@ -1,17 +1,164 @@
 "use strict";
 
-const { createKey } = require("../../../utils/index");
+const {
+  createKey,
+  sendEmail,
+  getIdentifier,
+  getISODateTime,
+} = require("../../../utils/index");
 const { tableName } = require("../../../config/index");
 const { errorMessages, successMessages } = require("../../../utils/constants");
 const { HTTPError } = require("../../../utils/errors");
 const { documentClient } = require("../../../config/db");
 const { roles } = require("../../../config/index");
 
-exports.handleAssignUserRole = async (req, res, next) => {};
+exports.handleAssignUserRole = async (req, res, next) => {
+  try {
+    const { role, groupID } = req.body;
+    // TODO: validate role and groupID with AJV
 
-exports.handleApproveUserRole = async (req, res, next) => {};
+    if (res.locals.userRoles.groupID === role) {
+      const error = errorMessages.USER_GROUP_ROLE_ALREADY_EXISTS();
+      throw new HTTPError(error.status, error.message);
+    }
 
-exports.handleRemoveUserRole = async (req, res, next) => {};
+    const groupPartitionKey = createKey(groupID, "group");
+
+    let queryParams = {
+      TableName: tableName,
+      Key: {
+        partitionKey: groupPartitionKey,
+        sortKey: groupPartitionKey,
+      },
+    };
+
+    const { Item } = await documentClient.get(queryParams).promise();
+
+    if (Item === null) {
+      const error = errorMessages.GROUP_DOES_NOT_EXIST();
+      throw new HTTPError(error.status, error.message);
+    }
+
+    queryParams = {
+      TableName: tableName,
+      IndexName: "InvertedIndex",
+      KeyConditionExpression:
+        "partitionKey = :groupPartitionKey AND sortKey = :userSortKey",
+      FilterExpression: "entityType = :entityType AND groupRole = :role",
+      ExpressionAttributeValues: {
+        ":groupPartitionKey": groupPartitionKey,
+        ":userSortKey": res.locals.userPartitionKey,
+        ":entityType": "user",
+        ":role": "moderator",
+      },
+    };
+
+    const { Items } = await documentClient.query(queryParams).promise();
+
+    if (Items.length !== 0) {
+      // TODO: send email to moderators
+    }
+
+    // TODO: send email to admins
+
+    const response = successMessages.USER_ROLE_ASSIGNMENT_REQUEST_SUBMITTED();
+    return res.status(response.status).send(response);
+  } catch (err) {
+    if (err.name === "HTTPError") {
+      return next(err);
+    }
+
+    const error = errorMessages.INTERNAL_SERVER_ERROR();
+    return next(error);
+  }
+};
+
+exports.handleApproveUserRole = async (req, res, next) => {
+  try {
+    const { role, groupID, userID } = req.body;
+
+    const userPartitionKey = createKey(userID, "user");
+    const groupSortKey = createKey(groupID, "group");
+
+    // TODO: validate with AJV
+
+    let queryParams = {
+      TableName: tableName,
+      Key: {
+        partitionKey: groupSortKey,
+        sortKey: groupSortKey,
+      },
+    };
+    const { Item } = await documentClient.get(queryParams).promise();
+    const groupData = Item;
+
+    queryParams = {
+      TableName: tableName,
+      Key: { partitionKey: userPartitionKey, sortKey: groupSortKey },
+    };
+    const res = await documentClient.get(queryParams).promise();
+    const ISODateTime = getISODateTime();
+
+    if (res === null) {
+      queryParams = {
+        TableName: tableName,
+        Item: {
+          entityType: "group",
+          partitionKey: userPartitionKey,
+          sortKey: groupSortKey,
+          groupName: groupData.groupName,
+          groupRole: role,
+          isGroupPrivate: groupData.isGroupPrivate,
+          createdAt: ISODateTime,
+          updatedAt: ISODateTime,
+        },
+      };
+      await documentClient.put(queryParams).promise();
+    } else {
+      queryParams = {
+        TableName: tableName,
+        Key: {
+          partitionKey: userPartitionKey,
+          sortKey: groupSortKey,
+        },
+        UpdateExpression: "set groupRole = :groupRole, updatedAt = :updatedAt",
+        ExpressionAttributeValues: {
+          ":groupRole": role,
+          ":updatedAt": ISODateTime,
+        },
+      };
+      await documentClient.update(queryParams).promise();
+    }
+
+    const response = successMessages.USER_ROLE_ASSIGNED_SUCCESSFULLY();
+    return res.status(response.status).send(response);
+  } catch (err) {
+    if (err.name === "HTTPError") {
+      return next(err);
+    }
+
+    const error = errorMessages.INTERNAL_SERVER_ERROR();
+    return next(error);
+  }
+};
+
+exports.handleRemoveUserRole = async (req, res, next) => {
+  try {
+    const { role, groupID, userID } = req.body;
+
+    const userPartitionKey = createKey(userID, "user");
+    const groupSortKey = createKey(groupID, "group");
+    
+    
+  } catch(err) {
+    if (err.name === "HTTPError") {
+      return next(err);
+    }
+
+    const error = errorMessages.INTERNAL_SERVER_ERROR();
+    return next(error);
+  }
+};
 
 exports.handleGetUserProfile = async (req, res, next) => {
   try {
@@ -49,7 +196,7 @@ exports.handleGetUserProfile = async (req, res, next) => {
 
     const { Item } = await documentClient.query(queryParams).promise();
 
-    if (Item.length === 0) {
+    if (Item === null) {
       const error = errorMessages.USER_DOES_NOT_EXIST();
       throw new HTTPError(error.status, error.message);
     }
@@ -99,6 +246,9 @@ exports.handleUpdateUserByUserID = async (req, res, next) => {
       updateString += ` ${key} = :${key}`;
       ExpressionAttributeValues[`:${key}`] = newUserData[key];
     });
+
+    updateString += " updatedAt = :updatedAt";
+    ExpressionAttributeValues[":updatedAt"] = getISODateTime();
 
     const queryParams = {
       TableName: tableName,

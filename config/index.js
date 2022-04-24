@@ -50,6 +50,7 @@ module.exports = {
   entityTypes: ["user", "experiment", "group", "share", "institution"],
   backoffInterval: Number(process.env.BACKOFF_INTERVAL) || 5000,
   tableName: process.env.TABLE_NAME || "Entity",
+  senderEmail: process.env.SENDER_EMAIL,
   corsConfig,
   helmetConfig,
   rateLimiterConfig,
