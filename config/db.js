@@ -10,9 +10,9 @@ const {
 
 const dynamoDB = new AWS.DynamoDB({
   accessKeyId: accessKeyID,
-  secretAccessKey,
-  region,
-  endpoint,
+  secretAccessKey: secretAccessKey,
+  region:region,
+  endpoint: endpoint,
 });
 
 const documentClient = new AWS.DynamoDB.DocumentClient({

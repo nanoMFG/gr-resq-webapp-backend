@@ -1,7 +1,8 @@
 "use strict";
 
 const { dynamoDB, documentClient } = require("../config/db");
-const { backoffInterval } = require("../config/index");
+const { backoffInterval,tableName } = require("../config/index");
+
 
 const checkTableStatus = async (tableName) => {
   try {
@@ -40,15 +41,20 @@ const waitForTable = async (tableName) => {
 };
 
 const createTable = async (tableSchema) => {
+  console.log("Creating table...");
   try {
     const { TableNames } = await dynamoDB.listTables().promise();
 
-    if (TableNames.includes(tableSchema.TableName)) {
+    if(TableNames.includes(tableName)) {
+    // if (TableNames.includes(tableSchema.TableName)) {
+      console.log(`Table ${tableName} already exists.`);
       return `Table ${tableSchema.TableName} already exists.`;
     }
-
+    console.log("Creating table now...");
     await dynamoDB.createTable(tableSchema).promise();
     await waitForTable(tableSchema.TableName);
+    console.log(`Table ${tableSchema.TableName} created successfully.`);
+    return `Table ${tableSchema.TableName} created successfully.`;
   } catch (error) {
     console.log(error);
   }
