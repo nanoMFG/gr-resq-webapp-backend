@@ -25,50 +25,50 @@ const dbSchema = {
       AttributeName: "email",
       AttributeType: "S",
     },
-    {
-      AttributeName: "entityType",
-      AttributeType: "S",
-    },
-    {
-      AttributeName: "firstName",
-      AttributeType: "S",
-    },
-    {
-      AttributeName: "lastName",
-      AttributeType: "S",
-    },
-    {
-      AttributeName: "authorID",
-      AttributeType: "S"
-    },
-    {
-      AttributeName: "passwordHash",
-      AttributeType: "B",
-    },
-    {
-      AttributeName: "institutionName",
-      AttributeType: "S",
-    },
-    {
-      AttributeName: "institutionDomain",
-      AttributeType: "S",
-    },
-    {
-      AttributeName: "groupName",
-      AttributeType: "S",
-    },
-    {
-      AttributeName: "groupRole",
-      AttributeType: "S",
-    },
-    {
-      AttributeName: "isGroupPrivate",
-      AttributeType: "BOOL",
-    },
-    {
-      AttributeName: "isExperimentPrivate",
-      AttributeType: "BOOL",
-    },
+    // {
+    //   AttributeName: "entityType",
+    //   AttributeType: "S",
+    // },
+    // {
+    //   AttributeName: "firstName",
+    //   AttributeType: "S",
+    // },
+    // {
+    //   AttributeName: "lastName",
+    //   AttributeType: "S",
+    // },
+    // {
+    //   AttributeName: "authorID",
+    //   AttributeType: "S"
+    // },
+    // {
+    //   AttributeName: "passwordHash",
+    //   AttributeType: "B",
+    // },
+    // {
+    //   AttributeName: "institutionName",
+    //   AttributeType: "S",
+    // },
+    // {
+    //   AttributeName: "institutionDomain",
+    //   AttributeType: "S",
+    // },
+    // {
+    //   AttributeName: "groupName",
+    //   AttributeType: "S",
+    // },
+    // {
+    //   AttributeName: "groupRole",
+    //   AttributeType: "S",
+    // },
+    // {
+    //   AttributeName: "isGroupPrivate",
+    //   AttributeType: "BOOL",
+    // },
+    // {
+    //   AttributeName: "isExperimentPrivate",
+    //   AttributeType: "BOOL",
+    // },
   ],
   ProvisionedThroughput: {
     ReadCapacityUnits: 10,
@@ -114,4 +114,4 @@ const dbSchema = {
   ],
 };
 
-module.exports = dbSchema;
+module.exports = {dbSchema};

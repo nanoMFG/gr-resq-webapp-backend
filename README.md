@@ -1,7 +1,25 @@
-# gr-resq-fastapi
-FastAPI implementation of the Gr-ResQ project.
+# gr-resq-node-backend
 
-## Steps to run/debug the app locally
-1. Create a virtual environment: ```python3 -m venv venv```
-2. Add a ```.env``` file. See [config.py](https://github.com/nanoMFG/gr-resq-webapp-backend/blob/master/app/core/config.py) to see required environment variables.
-3. Start server with `python3 start_server.py` in terminal or run it with [PyCharm](https://www.jetbrains.com/pycharm/).
+## Local Development
+
+## With Docker
+
+Prerequisites:  
+ - Local install of Docker. 
+ - Local install of the aws-cli
+
+ Note, if using Windows, this has only been tested in WSL environments. 
+1. Start local dynamodb container  
+`docker run -p 8000:8000 amazon/dynamodb-local`
+2. Copy Environment default environment variable assignments to `.env-development`:  
+`cp .env.template ./.env.development`
+3. Initialze database:   
+`node utils/setupDb.js`  
+(you may want to list tables with aws cli at this point\*)  
+Will be useful to develop tests that can load user data.  
+4. Start node app: 
+`node app.js`
+
+**\*Listing local dynamodb tables with aws cli**  
+`aws dynamodb list-tables --endpoint-url http://localhost:8000`
+

@@ -10,11 +10,11 @@ const {
   handleDeleteGroupByGroupID,
 } = require("../handlers/group");
 
-router.post("/create-group", checkAuthentication, handleCreateGroup);
+//router.post("/create-group", checkAuthentication, handleCreateGroup);
 
-router.get("/get-group/:groupID", checkAuthentication, handleGetGroupByGroupID);
+//router.get("/get-group/:groupID", checkAuthentication, handleGetGroupByGroupID);
 
-router.get("/get-user-groups/:userID", checkAuthentication, handleGetUserGroupsByUserID);
+//router.get("/get-user-groups/:userID", checkAuthentication, handleGetUserGroupsByUserID);
 
 router.put("/update-group/:groupID", checkAuthentication, handleUpdateGroupByGroupID);
 
